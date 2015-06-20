@@ -14,13 +14,17 @@ __hist_size__ = 64          # how many bins for each R,G,B histogram
 __min_duration__ = 7        # if a shot has length less than this, merge it with others
 
 class shotDetector:
-    def __init__(self, video_path, min_duration=__min_duration__, output_dir=None):
+    def __init__(self, video_path=None, min_duration=__min_duration__, output_dir=None):
         self.video_path = video_path
         self.shots = []
         self.min_duration = min_duration
         self.output_dir = output_dir
 
-    def run(self):
+    def run(self, video_path=None):
+        if video_path is not None:
+            self.video_path = video_path    
+        assert (self.video_path is not None), "you should must the video path!"
+
         cap = cv2.VideoCapture(self.video_path)
         hists = []
         frames = []
