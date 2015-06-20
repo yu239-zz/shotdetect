@@ -4,4 +4,4 @@ A simple yet effective python implementation for video shot detection of abrupt 
 
 tested on OpenCV-2.4.8
 
-usage: ./shotdetect.py <video-path> [<key-frames-output-dir>]
+usage: ./shotdetect.py video-path [key-frames-output-dir]
