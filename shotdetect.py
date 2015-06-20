@@ -16,7 +16,6 @@ __min_duration__ = 7        # if a shot has length less than this, merge it with
 class shotDetector:
     def __init__(self, video_path=None, min_duration=__min_duration__, output_dir=None):
         self.video_path = video_path
-        self.shots = []
         self.min_duration = min_duration
         self.output_dir = output_dir
 
@@ -25,6 +24,7 @@ class shotDetector:
             self.video_path = video_path    
         assert (self.video_path is not None), "you should must the video path!"
 
+        self.shots = []
         cap = cv2.VideoCapture(self.video_path)
         hists = []
         frames = []
