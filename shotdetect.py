@@ -10,8 +10,9 @@ import sys
   based on python OpenCV
 '''
 
-__hist_size__ = 64          # how many bins for each R,G,B histogram
-__min_duration__ = 7        # if a shot has length less than this, merge it with others
+__hist_size__ = 64             # how many bins for each R,G,B histogram
+__min_duration__ = 7           # if a shot has length less than this, merge it with others
+__absolute_threshold__ = 1.0   # any transition must be no less than this threshold
 
 class shotDetector:
     def __init__(self, video_path=None, min_duration=__min_duration__, output_dir=None):
@@ -42,16 +43,17 @@ class shotDetector:
         # compute hist chisquare distances
         scores = [cv2.compareHist(pair[0],pair[1],cv2.cv.CV_COMP_CHISQR) \
                       for pair in zip(hists[1:], hists[:-1])]
+        print "max diff:", max(scores), "min diff:", min(scores)
         # compute automatic threshold
         mean_score = np.mean(scores)
         std_score = np.std(scores)
-        threshold = mean_score + 4*std_score
+        threshold = max(__absolute_threshold__, mean_score + 3*std_score)
 
         # decide shot boundaries
         prev_i = 0
         prev_score = scores[0]
         for i, score in enumerate(scores[1:]):
-            if score>=threshold and abs(score-prev_score)>=threshold:
+            if score>=threshold and abs(score-prev_score)>=threshold/2.0:
                 self.shots.append((prev_i, i+2))
                 prev_i = i + 2
             prev_score = score
@@ -66,7 +68,7 @@ class shotDetector:
             os.system("mkdir -p %s" % self.output_dir)
             for shot in self.shots:
                 cv2.imwrite("%s/frame-%d.jpg" % (self.output_dir,shot[0]), frames[shot[0]])
-        print "key frames written to %s" % self.output_dir
+            print "key frames written to %s" % self.output_dir
 
     def merge_short_shots(self):
         # merge short shots
